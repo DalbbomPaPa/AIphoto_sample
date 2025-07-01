@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 사진 분석(simple Ver.)</title>
+
+    <!-- Tensorflow 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@latest/dist/mobilenet.min.js"></script>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>AI 사진 분석</h1>
+      <p>사진을 올리면 AI가 성격을 분석해줘요!</p>
+
+      <div id="app" class="card">
+        <!-- 1. 사진업로드섹션 -->
+        <div id="upload-section">
+          <img
+            id="image-preview"
+            src="https://placehold.co/400x300?text=Hello+World"
+            alt="이미지 미리보기"
+          />
+          <input type="file" id="photo-input" accept="image/*" hidden />
+          <button id="upload-button">사진 선택하기</button>
+        </div>
+
+        <!-- 2. 분석결과섹션 -->
+        <div id="result-section" class="hidden">
+          <div id="loading">
+            <div class="spinner"></div>
+            <p>사진을 분석하고 있습니다...</p>
+          </div>
+          <div id="analysis-result" class="hidden">
+            <h2>분석결과</h2>
+            <p id="result-text"></p>
+            <button id="reset-button">다른 사진으로 분석하기</button>
+          </div>
+        </div>
+      </div>
+
+      <footer>코딩 초보를 위한 클론 코딩 프로젝트</footer>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

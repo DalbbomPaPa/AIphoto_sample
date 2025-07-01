@@ -1,0 +1,138 @@
+// 1. HTML 요소들을 JS 변수로 가져오기
+const uploadSection = document.getElementById('upload-section');
+const imagePreview = document.getElementById('image-preview');
+const phtoInput = document.getElementById('photo-input');
+const uploadButton = document.getElementById('upload-button');
+
+const resultSection = document.getElementById('result-section');
+const loading = document.getElementById('loading');
+const analysisResult = document.getElementById('analysis-result');
+const resultText = document.getElementById('result-text');
+const resetButton = document.getElementById('reset-button');
+
+// AI 모델 저장 변수
+let model;
+
+// 페이지가 로드될 때 AI 모델을 미리 준비시키는 함수
+async function loadModel() {
+  console.log('AI 모델을 로드하는 중...');
+  try {
+    model = await mobilenet.load();
+    console.log('AI 모델 로드 완료!');
+    // 모델 로드 끝나면 버튼 활성화
+    uploadButton.disabled = false;
+    uploadButton.textContent = '사진 선택하기';
+  } catch (e) {
+    console.error('AI 모델 로드 실패:', e);
+    resultText.innerText = 'AI 모델 로드 실패. 페이지를 새로고침 해주세요..';
+  }
+}
+
+// 페이지가 시작될 때 버튼을 비활성화하고 모델을 로드
+uploadButton.disabled = true;
+uploadButton.textContent = 'AI 모델 로드 중...';
+loadModel();
+
+// 2. '사진 선택하기' 버튼 이벤트 처리
+uploadButton.addEventListener('click', () => {
+  // 숨겨진 파일 입력(input)창을 클릭
+  photoInput.click();
+});
+
+// 3. 사용자가 사진 파일을 선택했을 때 이벤트 처리
+phtoInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+
+  if (file) {
+    // fileReader로 이미지 미리보기
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imagePreview.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // "분석하기" 버튼으로 텍스트 변경
+    uploadButton.textContent = '이 사진으로 분석하기';
+    uploadButton.onclick = analyzePhoto;
+  }
+});
+
+// 4. "분석하기" 버튼 클릭 시 사진 분석 함수
+async function analyzePhoto() {
+  // 분석시작 : 업로드 섹션을 숨기고 결과 섹션을 보여줌
+  uploadSection.classList.add('hidden');
+  resultSection.classList.remove('hidden');
+  loading.classList.remove('hidden');
+  analysisResult.classList.add('hidden');
+
+  // 실제 AI 분석 실행
+  try {
+    const predictions = await model.classify(imagePreview);
+    console.log(predictions); // AI가 예측한 결과를 콘솔에서 확인
+
+    // 로딩 화면 숨기고 최종 결과 표출
+    loading.classList.add('hidden');
+    analysisResult.classList.remove('hidden');
+
+    // AI분석 결과 텍스트로 표시
+    displayResults(predictions);
+  } catch (e) {
+    console.error('사진 분석 실패:', e);
+    loading.classList.add('hidden');
+    analysisResult.classList.remove('hidden');
+    resultText.innerText = '사진 분석 실패. 다시 시도해주세요.';
+  }
+}
+
+// AI 분석 결과를 예쁘게 포맷해서 보여주는 함수
+function displayResults(predictions) {
+  if (predictions && predictions.length > 0) {
+    // 가장 확률이 높은 결과 하나를 선택
+    const topResult = predictions[0];
+    // className을 쉼표로 분리해서 더 자연스럽게 만듦
+    const objectName = topResult.className.split(',')[0];
+    const probability = Math.round(topResult.probability * 100); // 확률을 퍼센트로 변환
+
+    resultText.innerText = `이 사진은 "${probability}% 확률로 ${objectName}"(으)로 보입니다.`;
+
+    // 추가 설명
+    const personality = getPersonalityFor(objectName.toLowerCase());
+    resultText.innerText += `\n\n${personality}`;
+  } else {
+    resultText.innerText =
+      'AI가 이 사진을 분석할 수 없습니다. 다른 사진을 시도해보세요.';
+  }
+}
+
+// 5. "다른 사진으로 다시 분석하기" 버튼 클릭 시 초기 상태로 되돌리는 함수
+resetButton.addEventListener('click', () => {
+  // 모든 것을 초기 상태로 되돌림
+  resultSection.classList.add('hidden');
+  uploadButton.classList.remove('hidden');
+
+  // 이미지 미리보기와 버튼 텍스트 초기화
+  imagePreview.src = 'https://placehold.co/400x300?text=Hello+World';
+  uploadButton.textContent = '사진 선택하기';
+
+  // 버튼 클릭 이벤트를 원래대로 파일 입력창을 여는 것으로 변경
+  uploadButton.onclick = () => {
+    phtoInput.click();
+  };
+});
+
+// 인식된 사물에 따라 다른 성격 분석을 반환하는 함수
+function getPersonalityFor(object) {
+  if (object.includes('cat') || object.includes('kitten')) {
+    return '고양이 사진을 좋아하는 당신은 독립적이면서도 때로는 따뜻한 애정을 원하는 내면을 가졌군요. 자유로운 영혼의 소유자입니다!';
+  } else if (object.includes('dog') || object.includes('puppy')) {
+    return '강아지 사진을 선택한 당신은 사교적이고 활발하며, 사람들과의 깊은 유대감을 중요하게 생각하는 따뜻한 마음씨를 가졌습니다.';
+  } else if (object.includes('coffee') || object.includes('cup')) {
+    return '커피를 선택한 당신은 하루의 작은 여유와 낭만을 즐길 줄 아는 사람이군요. 차분하고 지적인 대화를 즐깁니다.';
+  } else if (object.includes('beach') || object.includes('ocean')) {
+    return '바다 사진을 고른 당신은 넓은 마음과 자유로운 영혼을 가졌습니다. 새로운 모험과 도전을 즐기는 긍정적인 성격의 소유자입니다.';
+  } else if (object.includes('book') || object.includes('library')) {
+    return '책을 선택한 당신은 지적인 호기심이 왕성하고, 깊이 있는 사고를 즐기는 탐구적인 성격의 소유자입니다.';
+  } else {
+    return '이 사진을 선택한 당신은 독특한 시각을 가지고 있군요! 평범함보다는 자신만의 개성과 스타일을 추구하는 경향이 있습니다.';
+  }
+}

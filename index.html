@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>바닐라 JS 포토 성향 테스트</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.13.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="uploader-section" class="card">
+        <h2>사진을 선택해주세요</h2>
+        <p>분석을 위해 3장 이상의 사진을 올려주세요.</p>
+        <input type="file" id="photo-input" multiple accept="image/*" />
+        <div id="preview-area"></div>
+        <button id="analyze-button" disabled>AI 분석 시작하기</button>
+      </div>
+
+      <div id="progress-section" class="card" style="display: none">
+        <h2>AI 분석 진행 중...</h2>
+        <progress id="progress-bar" value="0" max="100"></progress>
+        <p id="progress-text"></p>
+      </div>
+
+      <div id="result-section" class="card" style="display: none">
+        <h2>당신의 성향 분석 결과</h2>
+        <div id="results"></div>
+        <button id="restart-button">다시 테스트하기</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

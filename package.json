@@ -1,0 +1,18 @@
+{
+  "name": "aiphoto",
+  "version": "1.0.0",
+  "description": "안녕하세요! 코딩에 첫발을 내디딘 것을 환영합니다.\r 이 프로젝트는 웹 개발의 가장 기본이 되는 HTML, CSS, JavaScript를 이용해 간단한 'AI 사진 분석' 웹페이지를 만들어보는 클론코딩 프로젝트입니다.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.0"
+  }
+}
