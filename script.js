@@ -50,8 +50,8 @@ analyzeButton.addEventListener('click', () => {
 
   // 각 사진 분석
   const analyses = [];
-  for (let i = 0; i<photoFiles.length; i++) {
-    const file = photoFiiles[i];
+  for (let i = 0; i < photoFiles.length; i++) {
+    const file = photoFiles[i];
     const img = await createImageElement(file);
 
     const predictions = await model.classify(img);
@@ -71,7 +71,6 @@ analyzeButton.addEventListener('click', () => {
   // 결과 표시
   updateProgress(100, '분석완료!');
   displayResults(result);
-
 });
 
 // 다시하기 버튼 클릭시
@@ -111,3 +110,42 @@ function createImageElement(file) {
   })
 }
 
+// 성향 생성 함수 (간소화 버전)
+function generatePersonality(analyses) {
+  const keywordCounts = {};
+  analyses.forEach(analysis => {
+    analysis.predictions.forEach(pred => {
+      const keywords = pred.className.split(', ');
+      keywords.forEach(kw => {
+        keywordCounts[kw] = (keywordCounts[kw] || 0) + 1;
+      })
+    })
+  });
+
+  const topKeyword = Object.keys(keywordCounts).reduce((a, b) => keywordCounts[a] > keywordCounts[b] ? a : b, '알 수 없음');
+
+  let personality = "탐험가";
+  if (topKeyword.includes('person') || topKeyword.includes('people')) {
+    personalityType = "사교적인 인싸";
+  } else if (topKeyword.includes('cat') || topKeyword.includes('dog')) {
+    personality = "따뜻한 동물 애호가";
+  } else if (topKeyword.includes('plant') || topKeyword.includes('flower')) {
+    personality = "섬세한 자연주의자";
+  }
+
+  return {
+    type: personalityType,
+    description: `당신은 사진에서 '${topKeyword}'(을)를 중요하게 생각하는 경향이 있습니다.`;
+  };
+};
+
+// 결과 표시 함수
+function displayResults(result) {
+  progressSection.style.display = 'none';
+  resultSection.style.display = 'block';
+
+  resultsDiv.innerHTML = `
+    <h3>${result.type}</h3>
+    <p>${result.description}</p>
+    `;
+}
